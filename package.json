@@ -3,10 +3,13 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@prisma/client": "6.10.1",
+    "@prisma/extension-accelerate": "^2.0.1",
     "@tailwindcss/forms": "^0.5.10",
     "autoprefixer": "10.4.20",
     "bcrypt": "^5.1.1",
@@ -26,12 +29,23 @@
     "@types/bcrypt": "^5.0.2",
     "@types/node": "22.10.7",
     "@types/react": "19.0.7",
-    "@types/react-dom": "19.0.3"
+    "@types/react-dom": "19.0.3",
+    "prisma": "^6.10.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@prisma/engines",
       "bcrypt",
+      "prisma",
       "sharp"
     ]
-  }
+  },
+  "name": "nextjs-dashboard",
+  "version": "1.0.0",
+  "description": "This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.",
+  "main": "postcss.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
 }
