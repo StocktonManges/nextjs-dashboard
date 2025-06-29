@@ -4,7 +4,8 @@
     "build": "next build",
     "dev": "next dev --turbopack",
     "start": "next start",
-    "seed": "npx tsx prisma/seed.ts"
+    "seed": "npx prisma migrate reset --force && npx tsx prisma/seed.ts",
+    "query": "npx tsx ./prisma/query.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -34,6 +35,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@prisma/client",
       "@prisma/engines",
       "bcrypt",
       "prisma",
@@ -46,6 +48,5 @@
   "main": "postcss.config.js",
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "type": "module"
+  "license": "ISC"
 }

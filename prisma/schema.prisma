@@ -15,31 +15,31 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
+  id       String @id @default(uuid())
   name     String
-  email    String  @unique
+  email    String @unique
   password String
 }
 
 model Customer {
-  id        String    @id @default(uuid())
+  id        String @id @default(uuid())
   name      String
   email     String
   image_url String
 
-  invoices  Invoice[]
+  invoices Invoice[]
 }
 
 model Invoice {
-  id         String    @id @default(uuid())
-  customer   Customer  @relation(fields: [customer_id], references: [id])
+  id          String   @id @default(uuid())
+  customer    Customer @relation(fields: [customer_id], references: [id])
   customer_id String
-  amount     Int
-  status     String
-  date       DateTime
+  amount      Float
+  status      String
+  date        DateTime
 }
 
 model Revenue {
-  month   String  @id   // using month as the PK since it's unique
-  revenue Int
+  month   String @id // using month as the PK since it's unique
+  revenue Float
 }

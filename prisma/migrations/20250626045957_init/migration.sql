@@ -22,7 +22,7 @@ CREATE TABLE "Customer" (
 CREATE TABLE "Invoice" (
     "id" TEXT NOT NULL,
     "customer_id" TEXT NOT NULL,
-    "amount" INTEGER NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
     "status" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
 
@@ -32,7 +32,7 @@ CREATE TABLE "Invoice" (
 -- CreateTable
 CREATE TABLE "Revenue" (
     "month" TEXT NOT NULL,
-    "revenue" INTEGER NOT NULL,
+    "revenue" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "Revenue_pkey" PRIMARY KEY ("month")
 );
