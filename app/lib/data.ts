@@ -1,4 +1,4 @@
-import postgres from "postgres";
+import { prisma } from "@/prisma/prisma-client";
 import {
   CustomerField,
   CustomersTableType,
@@ -6,9 +6,6 @@ import {
   InvoicesTable,
 } from "./definitions";
 import { formatCurrency } from "./utils";
-import { prisma } from "@/prisma/prisma-client";
-
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
 export async function fetchRevenue() {
   try {
@@ -32,6 +29,7 @@ export async function fetchLatestInvoices() {
       select: {
         amount: true,
         id: true,
+        date: true,
         customer: {
           select: {
             name: true,
@@ -40,19 +38,20 @@ export async function fetchLatestInvoices() {
           },
         },
       },
-      orderBy: {
-        date: "desc",
-      },
       take: 5,
     });
 
-    const latestInvoices = data.map((invoice) => ({
-      amount: formatCurrency(invoice.amount),
-      id: invoice.id,
-      name: invoice.customer.name,
-      email: invoice.customer.email,
-      image_url: invoice.customer.image_url,
-    }));
+    const latestInvoices = data
+      .sort((a, b) => {
+        return a.date.getUTCSeconds() - b.date.getUTCSeconds();
+      })
+      .map((invoice) => ({
+        amount: formatCurrency(invoice.amount),
+        id: invoice.id,
+        name: invoice.customer.name,
+        email: invoice.customer.email,
+        image_url: invoice.customer.image_url,
+      }));
 
     return latestInvoices;
   } catch (error) {
@@ -143,6 +142,10 @@ export async function fetchInvoicesPages(query: string) {
         "Invoice".date::text ILIKE ${`%${query}%`} OR
         "Invoice".status ILIKE ${`%${query}%`}
     `;
+
+    if (!Array.isArray(data)) {
+      throw new Error("Error counting invoices.");
+    }
 
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
     return totalPages;
