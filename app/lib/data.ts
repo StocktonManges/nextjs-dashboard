@@ -6,10 +6,7 @@ import {
   InvoicesTable,
 } from "./definitions";
 import { formatCurrency } from "./utils";
-import { PrismaClient } from "@/generated/prisma";
-import { withAccelerate } from "@prisma/extension-accelerate";
-
-const prisma = new PrismaClient().$extends(withAccelerate());
+import { prisma } from "@/prisma/prisma-client";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: "require" });
 
@@ -157,14 +154,14 @@ export async function fetchInvoicesPages(query: string) {
 
 export async function fetchInvoiceById(id: string) {
   try {
-    const data = await sql<InvoiceForm[]>`
+    const data = await prisma.$queryRaw<InvoiceForm[]>`
       SELECT
-        invoices.id,
-        invoices.customer_id,
-        invoices.amount,
-        invoices.status
-      FROM invoices
-      WHERE invoices.id = ${id};
+        "Invoice".id,
+        "Invoice".customer_id,
+        "Invoice".amount,
+        "Invoice".status
+      FROM "Invoice"
+      WHERE "Invoice".id = ${id};
     `;
 
     const invoice = data.map((invoice) => ({
@@ -182,11 +179,11 @@ export async function fetchInvoiceById(id: string) {
 
 export async function fetchCustomers() {
   try {
-    const customers = await sql<CustomerField[]>`
+    const customers = await prisma.$queryRaw<CustomerField[]>`
       SELECT
         id,
         name
-      FROM customers
+      FROM "Customer"
       ORDER BY name ASC
     `;
 
@@ -199,22 +196,22 @@ export async function fetchCustomers() {
 
 export async function fetchFilteredCustomers(query: string) {
   try {
-    const data = await sql<CustomersTableType[]>`
+    const data = await prisma.$queryRaw<CustomersTableType[]>`
 		SELECT
-		  customers.id,
-		  customers.name,
-		  customers.email,
-		  customers.image_url,
-		  COUNT(invoices.id) AS total_invoices,
-		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
-		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
-		FROM customers
-		LEFT JOIN invoices ON customers.id = invoices.customer_id
+		  "Customer".id,
+		  "Customer".name,
+		  "Customer".email,
+		  "Customer".image_url,
+		  COUNT("Invoice".id) AS total_invoices,
+		  SUM(CASE WHEN "Invoice".status = 'pending' THEN "Invoice".amount ELSE 0 END) AS total_pending,
+		  SUM(CASE WHEN "Invoice".status = 'paid' THEN "Invoice".amount ELSE 0 END) AS total_paid
+		FROM "Customer"
+		LEFT JOIN "Invoice" ON "Customer".id = "Invoice".customer_id
 		WHERE
-		  customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
-		ORDER BY customers.name ASC
+		  "Customer".name ILIKE ${`%${query}%`} OR
+        "Customer".email ILIKE ${`%${query}%`}
+		GROUP BY "Customer".id, "Customer".name, "Customer".email, "Customer".image_url
+		ORDER BY "Customer".name ASC
 	  `;
 
     const customers = data.map((customer) => ({
